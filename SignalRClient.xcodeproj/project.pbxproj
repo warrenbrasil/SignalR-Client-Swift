@@ -11,6 +11,10 @@
 		5A01C0341EC1470F0091082D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A01C0331EC1470F0091082D /* AppDelegate.swift */; };
 		5A01C0361EC1470F0091082D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A01C0351EC1470F0091082D /* Assets.xcassets */; };
 		5A01C0391EC1470F0091082D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A01C0371EC1470F0091082D /* MainMenu.xib */; };
+		5A01C0431EC18B110091082D /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD455E31E5FECC300732962 /* SocketRocket.framework */; };
+		5A01C0441EC18B110091082D /* SocketRocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD455E31E5FECC300732962 /* SocketRocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A01C0461EC18B180091082D /* SignalRClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9803521E5FE60E00BFFB0A /* SignalRClient.framework */; };
+		5A01C0471EC18B180091082D /* SignalRClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9803521E5FE60E00BFFB0A /* SignalRClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5A341EB81E7CDCA400F6D41D /* TypeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB71E7CDCA400F6D41D /* TypeConverter.swift */; };
 		5A341EBA1E7D94B300F6D41D /* InvocationSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB91E7D94B300F6D41D /* InvocationSerializer.swift */; };
 		5A4F86C51E71A54900D9A13F /* SignalRError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4F86C41E71A54900D9A13F /* SignalRError.swift */; };
@@ -54,6 +58,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5A01C0481EC18B180091082D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A9803491E5FE60E00BFFB0A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A9803511E5FE60E00BFFB0A;
+			remoteInfo = SignalRClient;
+		};
 		5A73DFE81E63E2D4007F3913 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5A9803491E5FE60E00BFFB0A /* Project object */;
@@ -78,6 +89,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		5A01C0451EC18B110091082D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5A01C0471EC18B180091082D /* SignalRClient.framework in Embed Frameworks */,
+				5A01C0441EC18B110091082D /* SocketRocket.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A73DFE51E63E2CF007F3913 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -175,6 +198,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A01C0461EC18B180091082D /* SignalRClient.framework in Frameworks */,
+				5A01C0431EC18B110091082D /* SocketRocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,10 +367,12 @@
 				5A01C02D1EC1470F0091082D /* Sources */,
 				5A01C02E1EC1470F0091082D /* Frameworks */,
 				5A01C02F1EC1470F0091082D /* Resources */,
+				5A01C0451EC18B110091082D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5A01C0491EC18B180091082D /* PBXTargetDependency */,
 			);
 			name = Chat;
 			productName = Chat;
@@ -590,6 +617,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5A01C0491EC18B180091082D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A9803511E5FE60E00BFFB0A /* SignalRClient */;
+			targetProxy = 5A01C0481EC18B180091082D /* PBXContainerItemProxy */;
+		};
 		5A73DFE91E63E2D4007F3913 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5A9803511E5FE60E00BFFB0A /* SignalRClient */;
@@ -638,8 +670,13 @@
 		5A01C03C1EC1470F0091082D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = Chat/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = moozzyk.Chat;
@@ -651,8 +688,13 @@
 		5A01C03D1EC1470F0091082D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = Chat/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = moozzyk.Chat;
@@ -924,6 +966,7 @@
 				5A01C03D1EC1470F0091082D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5A98034C1E5FE60E00BFFB0A /* Build configuration list for PBXProject "SignalRClient" */ = {
 			isa = XCConfigurationList;

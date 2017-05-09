@@ -15,6 +15,10 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Chat" customModuleProvider="target">
             <connections>
+                <outlet property="chatTableView" destination="RjI-mD-IZZ" id="lgW-oE-l04"/>
+                <outlet property="msgTextField" destination="fph-fo-Qaj" id="LUs-DJ-PHb"/>
+                <outlet property="sendBtn" destination="qzd-LM-4HC" id="qNU-Zw-W3t"/>
+                <outlet property="usersOnlineTableView" destination="l6G-0I-VRH" id="OLZ-j7-qni"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -741,7 +745,7 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="nmw-Ta-pYo">
-                            <rect key="frame" x="1" y="365" width="469" height="16"/>
+                            <rect key="frame" x="1" y="-15" width="0.0" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="iMj-mm-ROV">
@@ -801,7 +805,7 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="vbK-5a-xzA">
-                            <rect key="frame" x="1" y="361" width="189" height="16"/>
+                            <rect key="frame" x="1" y="-16" width="0.0" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="uJY-KR-QWL">
