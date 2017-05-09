@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5A01C02C1EA0562D0091082D /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A01C02B1EA0562D0091082D /* Util.swift */; };
+		5A01C0341EC1470F0091082D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A01C0331EC1470F0091082D /* AppDelegate.swift */; };
+		5A01C0361EC1470F0091082D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A01C0351EC1470F0091082D /* Assets.xcassets */; };
+		5A01C0391EC1470F0091082D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A01C0371EC1470F0091082D /* MainMenu.xib */; };
 		5A341EB81E7CDCA400F6D41D /* TypeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB71E7CDCA400F6D41D /* TypeConverter.swift */; };
 		5A341EBA1E7D94B300F6D41D /* InvocationSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB91E7D94B300F6D41D /* InvocationSerializer.swift */; };
 		5A4F86C51E71A54900D9A13F /* SignalRError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4F86C41E71A54900D9A13F /* SignalRError.swift */; };
@@ -123,6 +126,11 @@
 
 /* Begin PBXFileReference section */
 		5A01C02B1EA0562D0091082D /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		5A01C0311EC1470F0091082D /* Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A01C0331EC1470F0091082D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5A01C0351EC1470F0091082D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5A01C0381EC1470F0091082D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		5A01C03A1EC1470F0091082D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A341EB71E7CDCA400F6D41D /* TypeConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeConverter.swift; sourceTree = "<group>"; };
 		5A341EB91E7D94B300F6D41D /* InvocationSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvocationSerializer.swift; sourceTree = "<group>"; };
 		5A4F86C41E71A54900D9A13F /* SignalRError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalRError.swift; sourceTree = "<group>"; };
@@ -163,6 +171,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5A01C02E1EC1470F0091082D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A98034E1E5FE60E00BFFB0A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -201,6 +216,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A01C0321EC1470F0091082D /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				5A01C0331EC1470F0091082D /* AppDelegate.swift */,
+				5A01C0351EC1470F0091082D /* Assets.xcassets */,
+				5A01C0371EC1470F0091082D /* MainMenu.xib */,
+				5A01C03A1EC1470F0091082D /* Info.plist */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
 		5A9803481E5FE60E00BFFB0A = {
 			isa = PBXGroup;
 			children = (
@@ -209,6 +235,7 @@
 				5A98035F1E5FE60E00BFFB0A /* SignalRClientTests */,
 				5A9A815C1E63CAE100FE62A6 /* SocketsSample */,
 				5AA9EFFF1E835AC200C5E248 /* HubSample */,
+				5A01C0321EC1470F0091082D /* Chat */,
 				5A9803531E5FE60E00BFFB0A /* Products */,
 				5AD455E21E5FECC200732962 /* Frameworks */,
 			);
@@ -221,6 +248,7 @@
 				5A98035B1E5FE60E00BFFB0A /* SignalRClientTests.xctest */,
 				5A9A815B1E63CAE100FE62A6 /* SocketsSample.app */,
 				5AA9EFFE1E835AC200C5E248 /* HubSample.app */,
+				5A01C0311EC1470F0091082D /* Chat.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -307,6 +335,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		5A01C0301EC1470F0091082D /* Chat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A01C03B1EC1470F0091082D /* Build configuration list for PBXNativeTarget "Chat" */;
+			buildPhases = (
+				5A01C02D1EC1470F0091082D /* Sources */,
+				5A01C02E1EC1470F0091082D /* Frameworks */,
+				5A01C02F1EC1470F0091082D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Chat;
+			productName = Chat;
+			productReference = 5A01C0311EC1470F0091082D /* Chat.app */;
+			productType = "com.apple.product-type.application";
+		};
 		5A9803511E5FE60E00BFFB0A /* SignalRClient */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A9803661E5FE60E00BFFB0A /* Build configuration list for PBXNativeTarget "SignalRClient" */;
@@ -393,6 +438,10 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Pawel Kadluczka";
 				TargetAttributes = {
+					5A01C0301EC1470F0091082D = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Automatic;
+					};
 					5A9803511E5FE60E00BFFB0A = {
 						CreatedOnToolsVersion = 8.1;
 						LastSwiftMigration = 0810;
@@ -429,11 +478,21 @@
 				5A98035A1E5FE60E00BFFB0A /* SignalRClientTests */,
 				5A9A815A1E63CAE100FE62A6 /* SocketsSample */,
 				5AA9EFFD1E835AC200C5E248 /* HubSample */,
+				5A01C0301EC1470F0091082D /* Chat */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5A01C02F1EC1470F0091082D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A01C0361EC1470F0091082D /* Assets.xcassets in Resources */,
+				5A01C0391EC1470F0091082D /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A9803501E5FE60E00BFFB0A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -469,6 +528,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5A01C02D1EC1470F0091082D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A01C0341EC1470F0091082D /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A98034D1E5FE60E00BFFB0A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -541,6 +608,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5A01C0371EC1470F0091082D /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5A01C0381EC1470F0091082D /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
 		5A9A81611E63CAE100FE62A6 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -560,6 +635,32 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5A01C03C1EC1470F0091082D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Chat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = moozzyk.Chat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		5A01C03D1EC1470F0091082D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Chat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = moozzyk.Chat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		5A9803641E5FE60E00BFFB0A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -816,6 +917,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5A01C03B1EC1470F0091082D /* Build configuration list for PBXNativeTarget "Chat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A01C03C1EC1470F0091082D /* Debug */,
+				5A01C03D1EC1470F0091082D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		5A98034C1E5FE60E00BFFB0A /* Build configuration list for PBXProject "SignalRClient" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
