@@ -202,7 +202,7 @@ class HubConnectionTests: XCTestCase {
     }
 
     class User {
-        public let firstName: String
+        let firstName: String
         let lastName: String
         let age: Int?
         let height: Double?

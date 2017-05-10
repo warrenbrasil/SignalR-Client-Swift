@@ -8,8 +8,10 @@
 
 import Foundation
 
-public class JSONTypeConverter: TypeConverter {
-    public func convertToWireType(obj: Any?) throws -> Any? {
+open class JSONTypeConverter: TypeConverter {
+    public init() {}
+
+    open func convertToWireType(obj: Any?) throws -> Any? {
         if isKnownType(obj: obj) || JSONSerialization.isValidJSONObject(obj: obj!) {
             return obj
         }
@@ -25,7 +27,7 @@ public class JSONTypeConverter: TypeConverter {
             obj is Bool || obj is Bool? || obj is [Bool] || obj is [Bool?];
     }
 
-    public func convertFromWireType<T>(obj:Any?, targetType: T.Type) throws -> T? {
+    open func convertFromWireType<T>(obj:Any?, targetType: T.Type) throws -> T? {
         if obj == nil {
             return nil
         }
@@ -42,7 +44,7 @@ public class JSONInvocationSerializer: InvocationSerializer {
 
     private let typeConverter: TypeConverter
 
-    init(typeConverter: TypeConverter? = nil) {
+    public init(typeConverter: TypeConverter? = nil) {
         self.typeConverter = typeConverter ?? JSONTypeConverter()
     }
 

@@ -25,6 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
     var chatHubConnectionDelegate: ChatHubConnectionDelegate?
     var name = ""
     var messages: [String] = []
+    var usersOnline: [[String]] = []
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         chatTableView.delegate = self
@@ -39,23 +40,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
 
         chatHubConnectionDelegate = ChatHubConnectionDelegate(app: self)
 
-        chatHubConnection = HubConnection(url: URL(string:"http://pawelka-10:5000/chat")!, query: "name=\(name)")
+        let invocationSerializer = JSONInvocationSerializer(typeConverter: UserTypeConverter())
+
+        chatHubConnection = HubConnection(url: URL(string:"http://192.168.0.108:5000/chat")!, query: "name=\(name)", invocationSerializer: invocationSerializer)
         chatHubConnection!.delegate = chatHubConnectionDelegate
         chatHubConnection!.on(method: "Send", callback: {args in
             self.appendMessage(message: "\(args[0]!): \(args[1]!)")
 
         })
         chatHubConnection!.on(method: "SetUsersOnline", callback: {args in
-            // self.appendMessage(message: "\(args[0]!): \(args[1]!)")
-            
+            self.appendUsers(users: self.getUsers(users: args[0] as! [Any]) as! [User])
         })
+
         chatHubConnection!.on(method: "UsersJoined", callback: {args in
-            self.appendMessage(message: "\(args[0]!)")
-            
+            let users = self.getUsers(users: args[0] as! [Any])
+            for u in users {
+                self.appendMessage(message: "\(u!.name) joined chat")
+            }
+            self.appendUsers(users: users as! [User])
         })
         chatHubConnection!.on(method: "UsersLeft", callback: {args in
-            self.appendMessage(message: "\(args[0]!)")
-            
+            let users = self.getUsers(users: args[0] as! [Any])
+            for u in users {
+                self.appendMessage(message: "\(u!.name) left chat")
+            }
+
+            self.removeUsers(users: users as! [User])
         })
 
         chatHubConnection!.start()
@@ -116,11 +126,77 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
         self.chatTableView.endUpdates()
         self.chatTableView.scrollRowToVisible(self.chatTableView.numberOfRows - 1)
     }
+
+    func appendUsers(users:[User]) {
+        var count = 0
+        self.dispatchQueue.sync {
+            for u in users {
+                if !userTracked(userId: u.connectionId) {
+                    usersOnline.append([u.connectionId, u.name])
+                    count += 1
+                }
+            }
+        }
+
+        if count == 0 {
+            return
+        }
+
+        self.usersOnlineTableView.reloadData()
+    }
+
+    func removeUsers(users:[User]) {
+        var count = 0
+        self.dispatchQueue.sync {
+            for u in users {
+                for i in 0...self.usersOnline.count {
+                    if usersOnline[i][0] == u.connectionId {
+                        usersOnline.remove(at: i)
+                        count += 1
+                        break;
+                    }
+                }
+            }
+        }
+
+        if count == 0 {
+            return
+        }
+
+        self.usersOnlineTableView.reloadData()
+    }
+
+    func getUsers(users:[Any]) -> [User?] {
+        if let usersObject = users as? [[String: Any?]?] {
+            let result: [User?] = usersObject.map({userDictionary in
+                if userDictionary == nil {
+                        return nil
+                }
+
+                let user = userDictionary!
+                return User(name: user["Name"] as! String, connectionId: user["ConnectionId"] as! String)
+            })
+
+            return result
+        }
+
+        return[]
+    }
+
+    func userTracked(userId: String) -> Bool {
+        for u in usersOnline {
+            if u[0] == userId {
+                return true
+            }
+        }
+
+        return false
+    }
     
     @IBAction func btnSend(sender: AnyObject) {
         let message = msgTextField.stringValue
         if msgTextField.stringValue != "" {
-            chatHubConnection?.invoke(method: "Send", arguments: [name, message], invocationDidComplete:
+            chatHubConnection?.invoke(method: "Send", arguments: [message], invocationDidComplete:
                 {error in
                     if error != nil {
                         self.appendMessage(message: "Error: \(error)")
@@ -138,23 +214,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
             }
             return count
         }
+
+        if tableView == usersOnlineTableView {
+            var count = -1
+            dispatchQueue.sync {
+                count = self.usersOnline.count
+            }
+            return count
+        }
         
         return 0
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if tableView != chatTableView {
-            return nil
-        }
-        
         if tableColumn == chatTableView.tableColumns[0] {
-            
             if let cellView = tableView.make(withIdentifier: "MessageID", owner: self) as? NSTableCellView {
                 cellView.textField?.stringValue = messages[row]
                 return cellView
             }
         }
-        
+
+        if tableColumn == usersOnlineTableView.tableColumns[0] {
+            if let cellView = tableView.make(withIdentifier: "UsersOnlineID", owner: self) as? NSTableCellView {
+                cellView.textField?.stringValue = usersOnline[row][1]
+                return cellView
+            }
+        }
         return nil
     }
 }

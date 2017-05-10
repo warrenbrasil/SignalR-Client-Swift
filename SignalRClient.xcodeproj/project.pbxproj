@@ -15,6 +15,8 @@
 		5A01C0441EC18B110091082D /* SocketRocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD455E31E5FECC300732962 /* SocketRocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5A01C0461EC18B180091082D /* SignalRClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9803521E5FE60E00BFFB0A /* SignalRClient.framework */; };
 		5A01C0471EC18B180091082D /* SignalRClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9803521E5FE60E00BFFB0A /* SignalRClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A01C04B1EC2DF8B0091082D /* UserTypeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A01C04A1EC2DF8B0091082D /* UserTypeConverter.swift */; };
+		5A01C04D1EC2E1C00091082D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A01C04C1EC2E1C00091082D /* User.swift */; };
 		5A341EB81E7CDCA400F6D41D /* TypeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB71E7CDCA400F6D41D /* TypeConverter.swift */; };
 		5A341EBA1E7D94B300F6D41D /* InvocationSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A341EB91E7D94B300F6D41D /* InvocationSerializer.swift */; };
 		5A4F86C51E71A54900D9A13F /* SignalRError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4F86C41E71A54900D9A13F /* SignalRError.swift */; };
@@ -154,6 +156,8 @@
 		5A01C0351EC1470F0091082D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5A01C0381EC1470F0091082D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		5A01C03A1EC1470F0091082D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5A01C04A1EC2DF8B0091082D /* UserTypeConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTypeConverter.swift; sourceTree = "<group>"; };
+		5A01C04C1EC2E1C00091082D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		5A341EB71E7CDCA400F6D41D /* TypeConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeConverter.swift; sourceTree = "<group>"; };
 		5A341EB91E7D94B300F6D41D /* InvocationSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvocationSerializer.swift; sourceTree = "<group>"; };
 		5A4F86C41E71A54900D9A13F /* SignalRError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalRError.swift; sourceTree = "<group>"; };
@@ -248,6 +252,8 @@
 				5A01C0351EC1470F0091082D /* Assets.xcassets */,
 				5A01C0371EC1470F0091082D /* MainMenu.xib */,
 				5A01C03A1EC1470F0091082D /* Info.plist */,
+				5A01C04A1EC2DF8B0091082D /* UserTypeConverter.swift */,
+				5A01C04C1EC2E1C00091082D /* User.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -560,6 +566,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A01C0341EC1470F0091082D /* AppDelegate.swift in Sources */,
+				5A01C04B1EC2DF8B0091082D /* UserTypeConverter.swift in Sources */,
+				5A01C04D1EC2E1C00091082D /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
