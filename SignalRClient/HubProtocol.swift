@@ -16,13 +16,13 @@ public enum ProtocolType: Int {
 public protocol HubProtocol {
     var name: String { get }
     var type: ProtocolType { get }
-    func parseMessages(input: Data) -> [HubMessage]
-    func writeMessage(message: HubMessage) -> Data
+    func parseMessages(input: Data) throws -> [HubMessage]
+    func writeMessage(message: HubMessage) throws -> Data
 }
 
 public enum MessageType: Int {
     case Invocation = 1
-    case Result
+    case StreamItem
     case Completion
 }
 
@@ -47,7 +47,7 @@ public class InvocationMessage: HubMessage {
 }
 
 public class StreamItemMessage: HubMessage {
-    public let messageType = MessageType.Result
+    public let messageType = MessageType.StreamItem
     public let invocationId: String
     public let item: Any?
 
