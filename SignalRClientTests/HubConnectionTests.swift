@@ -402,7 +402,7 @@ class HubConnectionTests: XCTestCase {
 
         // 3 messages: protocol negotation/handshake, stream method invocation, stream method cancellation
         XCTAssertEqual(3, messages.count)
-        XCTAssertEqual("{\"type\":5,\"invocationId\":\"1\"}\u{1e}", String(data: messages.last!, encoding: .utf8))
+        XCTAssertEqual("{\"invocationId\":\"1\",\"type\":5}\u{1e}", String(data: messages.last!, encoding: .utf8))
     }
 
     func testThatCallbackInvokedIfSendingCancellationMessageFailed() {
