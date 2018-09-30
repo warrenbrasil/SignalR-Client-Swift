@@ -472,7 +472,7 @@ class HubConnectionTests: XCTestCase {
 
         hubConnection.start()
 
-        waitForExpectations(timeout: 5 /*seconds*/)
+        waitForExpectations(timeout: 5000 /*seconds*/)
     }
 
     func testThatClientMethodsCanBeOverwritten() {

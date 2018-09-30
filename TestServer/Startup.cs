@@ -16,7 +16,9 @@ namespace TestServer
             services.AddSignalR(options =>
             {
                 options.EnableDetailedErrors = true;
-            });
+            })
+            .AddAzureSignalR();
+
             services.AddSingleton<EchoConnectionHandler>();
         }
 
@@ -36,7 +38,7 @@ namespace TestServer
                     dispatcherOptions.Transports = HttpTransportType.None;
                 }));
 
-            app.UseSignalR(options =>
+            app.UseAzureSignalR(options =>
             {
                 options.MapHub<TestHub>("/testhub");
                 options.MapHub<ChatHub>("/chat");
