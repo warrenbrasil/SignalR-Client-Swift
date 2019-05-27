@@ -46,7 +46,6 @@ public class HttpConnection: Connection {
         self.transportFactory = transportFactory
         self.logger = logger
         self.state = .initial
-        self.transportDelegate = ConnectionTransportDelegate(connection: self)
     }
 
     public func start() {
@@ -136,8 +135,8 @@ public class HttpConnection: Connection {
             return
         }
 
-        self.connectionId = negotiationResponse.connectionId
         let startUrl = self.createStartUrl(connectionId: negotiationResponse.connectionId)
+        self.transportDelegate = ConnectionTransportDelegate(connection: self, connectionId: negotiationResponse.connectionId)
         self.transport!.delegate = self.transportDelegate
         self.transport!.start(url: startUrl, options: self.options)
     }
@@ -154,8 +153,6 @@ public class HttpConnection: Connection {
         if changeState {
             _ = self.changeState(from: nil, to: .stopped)
         }
-        
-        self.connectionId = nil
         
         if leaveStartDispatchGroup {
             logger.log(logLevel: .debug, message: "Leaving startDispatchGroup (\(#function): \(#line))")
@@ -191,8 +188,6 @@ public class HttpConnection: Connection {
             logger.log(logLevel: .warning, message: "Connection not yet started")
             return
         }
-
-        self.connectionId = nil
         
         self.startDispatchGroup.wait()
         
@@ -210,7 +205,7 @@ public class HttpConnection: Connection {
         }
     }
 
-    fileprivate func transportDidOpen() {
+    fileprivate func transportDidOpen(connectionId: String?) {
         logger.log(logLevel: .info, message: "Transport started")
 
         let previousState = changeState(from: .connecting, to: .connected)
@@ -219,6 +214,7 @@ public class HttpConnection: Connection {
         startDispatchGroup.leave()
         if  previousState != nil {
             logger.log(logLevel: .debug, message: "Invoking connectionDidOpen")
+            self.connectionId = connectionId
             Util.dispatchToMainThread {
                 self.delegate?.connectionDidOpen(connection: self)
             }
@@ -239,8 +235,6 @@ public class HttpConnection: Connection {
 
         let previousState = changeState(from: nil, to: .stopped)
         logger.log(logLevel: .debug, message: "Previous state \(previousState!)")
-
-        self.connectionId = nil
         
         if previousState == .connecting {
             logger.log(logLevel: .debug, message: "Leaving startDispatchGroup (\(#function): \(#line))")
@@ -253,6 +247,9 @@ public class HttpConnection: Connection {
             }
         } else {
             logger.log(logLevel: .debug, message: "Invoking connectionDidClose (\(#function): \(#line))")
+
+            self.connectionId = nil
+
             Util.dispatchToMainThread {
                 self.delegate?.connectionDidClose(error: self.stopError ?? error)
             }
@@ -277,13 +274,15 @@ public class HttpConnection: Connection {
 
 public class ConnectionTransportDelegate: TransportDelegate {
     private weak var connection: HttpConnection?
+    private let connectionId: String?
 
-    fileprivate init(connection: HttpConnection!) {
+    fileprivate init(connection: HttpConnection!, connectionId: String?) {
         self.connection = connection
+        self.connectionId = connectionId
     }
 
     public func transportDidOpen() {
-        connection?.transportDidOpen()
+        connection?.transportDidOpen(connectionId: connectionId)
     }
 
     public func transportDidReceiveData(_ data: Data) {
