@@ -50,14 +50,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //        echoConnection!.start()
 
         let options: HttpConnectionOptions = .init()
-        options.headers = [
-            "access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0ltcGVyc29uYXRlQnlJbnRyYW5ldCI6ZmFsc2UsImN1c3RvbWVySWQiOiI1Yzk1NjM5NmVjYTllMDAwMTAwZWYzYTAiLCJhY2Nlc3NUb2tlbklkIjoiNjBkMGM1MDQ0OTBkMTkwMDE5ZTYxMGYwIiwiYWNjZXNzVG9rZW5IYXNoIjoiMWY0ZTFiMjA5NWJlYjVkMjRlMmRmNDM2NmFhMDMxMmU3ZTBiNWQzMDliMTdlYWE5YzM0ZmFmYTNiYjE1NjM5NCIsImlhdCI6MTYyNDI5NDY2MCwiZXhwIjoxNjI0ODk5NDYwfQ.uFrjrADAEA22yxMERTO_vIYq9lTpzT_TZ9gHx5rcy0M"
-        ]
-        reactiveConnection = CombineHTTPConnection(
-            url: url,//.init(string: "https://api-core-trade-marketdata.dev.warren.com.br/tickerhub")!,
-            options: options,
-            logger: NullLogger()
-        )
         reactiveConnection?.publisher.sink(
             receiveCompletion: { completion in
                 switch completion {
