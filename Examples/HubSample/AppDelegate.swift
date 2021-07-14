@@ -58,22 +58,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
         )
 
         combineHubConnection?
-            .on(method: "NewMessage")
-            .sink(
-                receiveValue: { extractor in
-                    print(extractor)
-                }
-            )
-            .store(in: &subscriptions)
-
-        combineHubConnection?
             .connectionPublisher
             .sink(
                 receiveCompletion: { completion in
                     print(completion)
                 },
-                receiveValue: { event in
-                    print(event)
+                receiveValue: { [weak self] event in
+                    switch event {
+                    case .opened:
+                        self?.connectionDidStart()
+                    case let .willReconnectAfterFailure(error):
+                        print(error)
+                    case let .streamInvocationFailed(handle, error):
+                        print(handle, error)
+                    case .reconnected:
+                        print("reconnected")
+                    case .closed:
+                        print("closed")
+                    }
+                }
+            )
+            .store(in: &subscriptions)
+
+        combineHubConnection?
+            .on(method: "NewMessage")
+            .sink(
+                receiveValue: { extractor in
+                    print(extractor)
                 }
             )
             .store(in: &subscriptions)
@@ -171,7 +182,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
 //                    self.appendMessage(message: "Error: \(e)")
 //                }
 //            }
-            combineHubConnection?.invoke(method: "Broadcast", arguments: [name, message])
+            combineHubConnection?
+                .invoke(method: "Broadcast", arguments: [name, message])
+                .sink(
+                    receiveCompletion: { completion in
+                        print(completion)
+                    },
+                    receiveValue: { _ in
+                        print("receiveValue")
+                    }
+                )
+                .store(in: &subscriptions)
+
             msgTextField.stringValue = ""
         }
     }

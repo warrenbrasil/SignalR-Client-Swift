@@ -93,6 +93,7 @@ public final class CombineHubConnection: ReactiveHubConnection {
 
     deinit {
         onMethodSubjects.removeAll()
+        streamSubjects.removeAll()
         simpleInvocationSubjects.removeAll()
         decodableInvocationSubjects.removeAll()
     }
