@@ -8,11 +8,11 @@
 
 import Foundation
 
-public struct WrappedDecodable: Equatable {
-    public let wrappedValue: Any
-    private let isEqual: (WrappedDecodable) -> Bool
+struct WrappedDecodable: Equatable {
+    let wrappedValue: Any
+    let isEqual: (WrappedDecodable) -> Bool
 
-    public init<T: Decodable>(_ value: T) {
+    init<T: Decodable>(_ value: T) {
         self.wrappedValue = value
         isEqual = { otherWrappedDecodable in
             guard let other = otherWrappedDecodable.wrappedValue as? T else { return false }
@@ -22,11 +22,11 @@ public struct WrappedDecodable: Equatable {
         }
     }
 
-    public func decoded<T: Decodable>(as: T.Type) -> T? {
+    func decoded<T: Decodable>(as: T.Type) -> T? {
         self.wrappedValue as? T
     }
 
-    public static func == (lhs: WrappedDecodable, rhs: WrappedDecodable) -> Bool {
+    static func == (lhs: WrappedDecodable, rhs: WrappedDecodable) -> Bool {
         lhs.isEqual(rhs)
     }
 }

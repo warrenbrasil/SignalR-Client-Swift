@@ -11,7 +11,6 @@ import Foundation
 
 @available(iOS 13.0, macOS 10.15, *)
 public final class CombineHubConnection: ReactiveHubConnection {
-
     // MARK: - Dependencies
 
     private(set) var hubConnection: HubConnectionProtocol
@@ -22,18 +21,14 @@ public final class CombineHubConnection: ReactiveHubConnection {
     public var connectionPublisher: AnyPublisher<ReactiveHubConnectionEvent, ReactiveHubConnectionFailure> {
         connectionSubject.removeDuplicates().eraseToAnyPublisher()
     }
-    public var invocationPublisher: AnyPublisher<ReactiveHubInvocationEvent, ReactiveHubInvocationFailure> {
-        invocationSubject.removeDuplicates().eraseToAnyPublisher()
-    }
-    public var streamPublisher: AnyPublisher<ReactiveHubStreamEvent, ReactiveHubStreamFailure> {
-        streamSubject.removeDuplicates().eraseToAnyPublisher()
-    }
 
     // MARK: - Internal Properties
 
     let connectionSubject: PassthroughSubject<ReactiveHubConnectionEvent, ReactiveHubConnectionFailure> = .init()
-    let invocationSubject: PassthroughSubject<ReactiveHubInvocationEvent, ReactiveHubInvocationFailure> = .init()
-    let streamSubject: PassthroughSubject<ReactiveHubStreamEvent, ReactiveHubStreamFailure> = .init()
+    private(set) var onMethodSubjects: [String: PassthroughSubject<ArgumentExtractor, Never>] = [:]
+    private(set) var streamSubjects: [String: PassthroughSubject<ReactiveHubStreamOutputBox, Error>] = [:]
+    private(set) var simpleInvocationSubjects: [String: PassthroughSubject<Void, Error>] = [:]
+    private(set) var decodableInvocationSubjects: [String: PassthroughSubject<WrappedDecodable?, Error>] = [:]
 
     // MARK: - Initialization
 
@@ -82,7 +77,7 @@ public final class CombineHubConnection: ReactiveHubConnection {
         reconnectPolicy: ReconnectPolicy? = nil,
         logger: Logger = NullLogger()
     ) {
-        let reconnectPolicy = reconnectPolicy ?? NoReconnectPolicy()
+        let reconnectPolicy = reconnectPolicy ?? DefaultReconnectPolicy()
         self.init(
             url: url,
             httpConnectionOptions: options,
@@ -96,104 +91,152 @@ public final class CombineHubConnection: ReactiveHubConnection {
         )
     }
 
+    deinit {
+        onMethodSubjects.removeAll()
+        simpleInvocationSubjects.removeAll()
+        decodableInvocationSubjects.removeAll()
+    }
+
     // MARK: - Public API
 
     public func start() {
         hubConnection.start()
     }
 
-    public func on(method: String) {
+    public func on(method: String) -> AnyPublisher<ArgumentExtractor, Never> {
+        let subject: PassthroughSubject<ArgumentExtractor, Never>
+        if let subjectInMemory = onMethodSubjects[method] {
+            subject = subjectInMemory
+        } else {
+            subject = .init()
+            onMethodSubjects[method] = subject
+        }
         hubConnection.on(
             method: method,
-            callback: { [weak self] argumentExtractor in
-                self?.connectionSubject.send(.gotArgumentExtractor(argumentExtractor, forMethod: method))
-            }
+            callback: { subject.send($0) }
         )
+        return subject.eraseToAnyPublisher()
     }
 
-    public func send(
+    public func send(method: String, arguments: [Encodable]) -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { [hubConnection] promisse in
+            hubConnection.send(
+                method: method,
+                arguments: arguments,
+                sendDidComplete: { error in
+                    if let error = error {
+                        promisse(.failure(error))
+                    } else {
+                        promisse(.success(()))
+                    }
+                }
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+
+    public func stream<T>(
         method: String,
         arguments: [Encodable]
-    ) {
-        hubConnection.send(
+    ) -> AnyPublisher<ReactiveHubStreamOutput<T>, Error> where T : Decodable {
+        let subject: PassthroughSubject<ReactiveHubStreamOutputBox, Error>
+        if let subjectInMemory = streamSubjects[method] {
+            subject = subjectInMemory
+        } else {
+            subject = .init()
+            streamSubjects[method] = subject
+        }
+        let streamHandle = hubConnection.stream(
             method: method,
             arguments: arguments,
-            sendDidComplete: { [weak self] error in
+            streamItemReceived: { (value: T) in
+                subject.send(.itemReceived(.init(value)))
+            },
+            invocationDidComplete: { error in
                 if let error = error {
-                    self?.connectionSubject.send(.failedToSendArguments(arguments, toMethod: method, error: error))
+                    subject.send(completion: .failure(error))
                 } else {
-                    self?.connectionSubject.send(.succesfullySentArguments(arguments, toMethod: method))
+                    subject.send(.invocationCompleted)
                 }
             }
         )
+        return subject
+            .handleEvents(
+                receiveCancel: { [weak self] in
+                    self?.cancelStreamInvocation(streamHandle: streamHandle)
+                }
+            )
+            .map { wrappedValue -> ReactiveHubStreamOutput<T> in
+                switch wrappedValue {
+                case let .itemReceived(wrappedItem):
+                    guard let decodedItem = wrappedItem.decoded(as: T.self) else {
+                        preconditionFailure("THIS SHOULD NEVER HAPPEN!")
+                    }
+                    return .itemReceived(decodedItem)
+                case .invocationCompleted:
+                    return .invocationCompleted
+                }
+            }
+            .eraseToAnyPublisher()
     }
 
-    public func invoke(
-        method: String,
-        arguments: [Encodable]
-    ) {
+    public func invoke(method: String, arguments: [Encodable]) -> AnyPublisher<Void, Error> {
+        let subject: PassthroughSubject<Void, Error>
+        if let subjectInMemory = simpleInvocationSubjects[method] {
+            subject = subjectInMemory
+        } else {
+            subject = .init()
+            simpleInvocationSubjects[method] = subject
+        }
         hubConnection.invoke(
             method: method,
             arguments: arguments,
             invocationDidComplete: { [weak self] error in
                 if let error = error {
-                    self?.invocationSubject.send(completion: .failure(.invokeCompletedWithError(error)))
+                    subject.send(completion: .failure(error))
+                    self?.simpleInvocationSubjects.removeValue(forKey: method)
                 } else {
-                    self?.invocationSubject.send(.invocationCompleted(forMethod: method, withArguments: arguments))
+                    subject.send(())
                 }
             }
         )
+        return subject.eraseToAnyPublisher()
     }
 
-    public func invoke<T>(
-        method: String,
-        arguments: [Encodable],
-        resultType: T.Type
-    ) where T : Decodable {
+    public func invoke<T>(method: String, arguments: [Encodable], resultType: T.Type) -> AnyPublisher<T?, Error> where T : Decodable {
+        let subject: PassthroughSubject<WrappedDecodable?, Error>
+        if let subjectInMemory = decodableInvocationSubjects[method] {
+            subject = subjectInMemory
+        } else {
+            subject = .init()
+            decodableInvocationSubjects[method] = subject
+        }
         hubConnection.invoke(
             method: method,
             arguments: arguments,
             resultType: resultType,
             invocationDidComplete: { [weak self] response, error in
                 if let error = error {
-                    self?.invocationSubject.send(completion: .failure(.invokeCompletedWithError(error)))
+                    subject.send(completion: .failure(error))
+                    self?.decodableInvocationSubjects.removeValue(forKey: method)
+                } else if let response = response {
+                    subject.send(.init(response))
                 } else {
-                    var item: InvocationItem? = nil
-                    if let response = response {
-                        item = .init(response)
-                    }
-                    self?.invocationSubject.send(.itemReceived(item, fromMethod: method, withArguments: arguments))
+                    subject.send(nil)
                 }
             }
         )
-    }
-
-    public func stream<T>(
-        method: String,
-        arguments: [Encodable],
-        streamResultType: T.Type
-    ) -> StreamHandle where T : Decodable {
-        return hubConnection.stream(
-            method: method, arguments: arguments,
-            streamItemReceived: { [weak self] (value: T) in
-                let item: StreamItem = .init(value)
-                self?.streamSubject.send(.itemReceived(item, fromMethod: method, withArguments: arguments))
-            },
-            invocationDidComplete: { [weak self] error in
-                if let error = error {
-                    self?.streamSubject.send(completion: .failure(.streamCompletedWithError(error)))
-                } else {
-                    self?.streamSubject.send(.streamInvocationCompleted(forMethod: method, withArguments: arguments))
-                }
-            }
-        )
+        return subject
+            .removeDuplicates()
+            .map { $0?.decoded(as: resultType) }
+            .eraseToAnyPublisher()
     }
 
     public func cancelStreamInvocation(streamHandle: StreamHandle) {
         hubConnection.cancelStreamInvocation(
             streamHandle: streamHandle,
             cancelDidFail: { [weak self] error in
-                self?.streamSubject.send(.cancelationFailed(forHandle: streamHandle, withError: error))
+                self?.connectionSubject.send(.streamInvocationFailed(forHandle: streamHandle, withError: error))
             }
         )
     }
