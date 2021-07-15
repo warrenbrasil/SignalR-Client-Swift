@@ -16,8 +16,6 @@ struct WrappedDecodable: Equatable {
         self.wrappedValue = value
         isEqual = { otherWrappedDecodable in
             guard let other = otherWrappedDecodable.wrappedValue as? T else { return false }
-            guard value is AnyHashable else { return false }
-            guard other is AnyHashable else { return false }
             return other as? AnyHashable == value as? AnyHashable
         }
     }

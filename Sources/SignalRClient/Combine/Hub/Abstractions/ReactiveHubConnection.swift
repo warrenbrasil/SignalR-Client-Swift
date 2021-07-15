@@ -19,7 +19,6 @@ public protocol ReactiveHubConnection: AnyObject {
     func invoke(method: String, arguments: [Encodable]) -> AnyPublisher<Void, Error>
     func invoke<T: Decodable>(method: String, arguments: [Encodable], resultType: T.Type) -> AnyPublisher<T?, Error>
     func stream<T: Decodable>(method: String, arguments: [Encodable]) -> AnyPublisher<ReactiveHubStreamOutput<T>, Error>
-    func cancelStreamInvocation(streamHandle: StreamHandle)
     func stop()
 }
 

@@ -201,7 +201,13 @@ public final class CombineHubConnection: ReactiveHubConnection {
                 }
             }
         )
-        return subject.eraseToAnyPublisher()
+        return subject
+            .handleEvents(
+                receiveCancel: { [weak self] in
+                    self?.simpleInvocationSubjects.removeValue(forKey: method)
+                }
+            )
+            .eraseToAnyPublisher()
     }
 
     public func invoke<T>(method: String, arguments: [Encodable], resultType: T.Type) -> AnyPublisher<T?, Error> where T : Decodable {
@@ -228,22 +234,29 @@ public final class CombineHubConnection: ReactiveHubConnection {
             }
         )
         return subject
+            .handleEvents(
+                receiveCancel: { [weak self] in
+                    self?.decodableInvocationSubjects.removeValue(forKey: method)
+                }
+            )
             .removeDuplicates()
             .map { $0?.decoded(as: resultType) }
             .eraseToAnyPublisher()
     }
 
-    public func cancelStreamInvocation(streamHandle: StreamHandle) {
+    public func stop() {
+        hubConnection.stop()
+    }
+
+    // MARK: - Private API
+
+    private func cancelStreamInvocation(streamHandle: StreamHandle) {
         hubConnection.cancelStreamInvocation(
             streamHandle: streamHandle,
             cancelDidFail: { [weak self] error in
                 self?.connectionSubject.send(.streamInvocationFailed(forHandle: streamHandle, withError: error))
             }
         )
-    }
-
-    public func stop() {
-        hubConnection.stop()
     }
 }
 
