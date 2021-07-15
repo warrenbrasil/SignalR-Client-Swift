@@ -13,7 +13,7 @@ import Combine
 public final class CombineHTTPConnection: ReactiveConnection {
     // MARK: - Dependencies
 
-    private(set) var httpConnection: Connection
+    private var httpConnection: Connection
 
     // MARK: - Public Properties
 
@@ -24,7 +24,7 @@ public final class CombineHTTPConnection: ReactiveConnection {
 
     // MARK: - Internal Properties
 
-    let connectionSubject: PassthroughSubject<ReactiveConnectionEvent, ReactiveConnectionFailure> = .init()
+    private let connectionSubject: PassthroughSubject<ReactiveConnectionEvent, ReactiveConnectionFailure> = .init()
 
 
     // MARK: - Initialization
@@ -35,28 +35,19 @@ public final class CombineHTTPConnection: ReactiveConnection {
         logger: Logger = NullLogger()
     ) {
         self.init(
-            url: url,
-            options: options,
-            transportFactory: DefaultTransportFactory(logger: logger),
-            logger: logger
+            httpConnection: HttpConnection(
+                url: url,
+                options: options,
+                transportFactory: DefaultTransportFactory(logger: logger),
+                logger: logger
+            )
         )
     }
 
-    init(
-        url: URL,
-        options: HttpConnectionOptions,
-        transportFactory: TransportFactory,
-        logger: Logger
-    ) {
-        self.httpConnection = HttpConnection(
-            url: url,
-            options: options,
-            transportFactory: transportFactory,
-            logger: logger
-        )
+    init(httpConnection: Connection) {
+        self.httpConnection = httpConnection
         self.httpConnection.delegate = self
     }
-
 
     // MARK: Public API
 
