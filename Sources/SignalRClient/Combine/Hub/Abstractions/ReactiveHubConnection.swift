@@ -21,12 +21,3 @@ public protocol ReactiveHubConnection: AnyObject {
     func stream<T: Decodable>(method: String, arguments: [Encodable]) -> AnyPublisher<ReactiveHubStreamOutput<T>, Error>
     func stop()
 }
-
-//@frozen public struct AnyDecodable: Decodable {
-//    private var value: Decodable
-//    public var value: Any { _value }
-//
-//    public init<T: Decodable>(_ value: T) {
-//        self._value = value
-//    }
-//}
