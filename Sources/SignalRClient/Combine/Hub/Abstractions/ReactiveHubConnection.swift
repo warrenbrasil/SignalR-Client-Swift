@@ -14,8 +14,8 @@ public protocol ReactiveHubConnection: AnyObject {
     var connectionId: String? { get }
     var connectionPublisher: AnyPublisher<ReactiveHubConnectionEvent, ReactiveHubConnectionFailure> { get }
     func start()
-    func on(method: String) -> AnyPublisher<ArgumentExtractor, Never>
     func send(method: String, arguments:[Encodable]) -> AnyPublisher<Void, Error>
+    func on(method: String) -> AnyPublisher<ArgumentExtractor, Never>
     func invoke(method: String, arguments: [Encodable]) -> AnyPublisher<Void, Error>
     func invoke<T: Decodable>(method: String, arguments: [Encodable], resultType: T.Type) -> AnyPublisher<T?, Error>
     func stream<T: Decodable>(method: String, arguments: [Encodable]) -> AnyPublisher<ReactiveHubStreamOutput<T>, Error>

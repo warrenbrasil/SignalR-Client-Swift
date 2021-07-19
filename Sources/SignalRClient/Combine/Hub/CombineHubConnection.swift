@@ -32,24 +32,33 @@ public final class CombineHubConnection: ReactiveHubConnection {
 
     // MARK: - Initialization
 
-    init(
+    init(hubConnection: HubConnectionProtocol) {
+        self.hubConnection = hubConnection
+        self.hubConnection.delegate = self
+    }
+
+    public convenience init(
         url: URL,
-        httpConnectionOptions: HttpConnectionOptions,
-        transportFactory: TransportFactory,
-        logger: Logger,
-        hubProtocol: HubProtocol,
-        reconnectPolicy: ReconnectPolicy
+        options: HttpConnectionOptions = HttpConnectionOptions(),
+        permittedTransportTypes: TransportType = .all,
+        reconnectPolicy: ReconnectPolicy? = nil,
+        logger: Logger = NullLogger()
     ) {
+        let reconnectPolicy = reconnectPolicy ?? DefaultReconnectPolicy()
+        let transportFactory = DefaultTransportFactory(
+            logger: logger,
+            permittedTransportTypes: permittedTransportTypes
+        )
         let connectionFactory: () -> HttpConnection = {
             // HttpConnection may overwrite some properties (most notably accessTokenProvider
             // when connecting to Azure SingalR Service) so needs its own copy to not corrupt
             // the instance provided by the user
             let httpConnectionOptionsCopy = HttpConnectionOptions()
-            httpConnectionOptionsCopy.headers = httpConnectionOptions.headers
-            httpConnectionOptionsCopy.accessTokenProvider = httpConnectionOptions.accessTokenProvider
-            httpConnectionOptionsCopy.httpClientFactory = httpConnectionOptions.httpClientFactory
-            httpConnectionOptionsCopy.skipNegotiation = httpConnectionOptions.skipNegotiation
-            httpConnectionOptionsCopy.requestTimeout = httpConnectionOptions.requestTimeout
+            httpConnectionOptionsCopy.headers = options.headers
+            httpConnectionOptionsCopy.accessTokenProvider = options.accessTokenProvider
+            httpConnectionOptionsCopy.httpClientFactory = options.httpClientFactory
+            httpConnectionOptionsCopy.skipNegotiation = options.skipNegotiation
+            httpConnectionOptionsCopy.requestTimeout = options.requestTimeout
             return HttpConnection(
                 url: url,
                 options: httpConnectionOptionsCopy,
@@ -62,32 +71,12 @@ public final class CombineHubConnection: ReactiveHubConnection {
             reconnectPolicy: reconnectPolicy,
             logger: logger
         )
-        self.hubConnection = HubConnection(
-            connection: reconnectableConnection,
-            hubProtocol: hubProtocol,
-            logger: logger
-        )
-        self.hubConnection.delegate = self
-    }
-
-    public convenience init(
-        url: URL,
-        options: HttpConnectionOptions = HttpConnectionOptions(),
-        permittedTransportTypes: TransportType = .all,
-        reconnectPolicy: ReconnectPolicy? = nil,
-        logger: Logger = NullLogger()
-    ) {
-        let reconnectPolicy = reconnectPolicy ?? DefaultReconnectPolicy()
         self.init(
-            url: url,
-            httpConnectionOptions: options,
-            transportFactory: DefaultTransportFactory(
-                logger: logger,
-                permittedTransportTypes: permittedTransportTypes
-            ),
-            logger: logger,
-            hubProtocol: JSONHubProtocol(logger: logger),
-            reconnectPolicy: reconnectPolicy
+            hubConnection: HubConnection(
+                connection: reconnectableConnection,
+                hubProtocol: JSONHubProtocol(logger: logger),
+                logger: logger
+            )
         )
     }
 
@@ -102,21 +91,6 @@ public final class CombineHubConnection: ReactiveHubConnection {
 
     public func start() {
         hubConnection.start()
-    }
-
-    public func on(method: String) -> AnyPublisher<ArgumentExtractor, Never> {
-        let subject: PassthroughSubject<ArgumentExtractor, Never>
-        if let subjectInMemory = onMethodSubjects[method] {
-            subject = subjectInMemory
-        } else {
-            subject = .init()
-            onMethodSubjects[method] = subject
-        }
-        hubConnection.on(
-            method: method,
-            callback: { subject.send($0) }
-        )
-        return subject.eraseToAnyPublisher()
     }
 
     public func send(method: String, arguments: [Encodable]) -> AnyPublisher<Void, Error> {
@@ -134,6 +108,21 @@ public final class CombineHubConnection: ReactiveHubConnection {
             )
         }
         .eraseToAnyPublisher()
+    }
+
+    public func on(method: String) -> AnyPublisher<ArgumentExtractor, Never> {
+        let subject: PassthroughSubject<ArgumentExtractor, Never>
+        if let subjectInMemory = onMethodSubjects[method] {
+            subject = subjectInMemory
+        } else {
+            subject = .init()
+            onMethodSubjects[method] = subject
+        }
+        hubConnection.on(
+            method: method,
+            callback: { subject.send($0) }
+        )
+        return subject.eraseToAnyPublisher()
     }
 
     public func stream<T>(
@@ -165,6 +154,7 @@ public final class CombineHubConnection: ReactiveHubConnection {
             .handleEvents(
                 receiveCancel: { [weak self] in
                     self?.cancelStreamInvocation(streamHandle: streamHandle)
+                    self?.streamSubjects.removeValue(forKey: method)
                 }
             )
             .map { wrappedValue -> ReactiveHubStreamOutput<T> in
