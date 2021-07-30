@@ -108,6 +108,8 @@
 		8F0518C2269F2EF300ECC233 /* Encodable+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0518C0269F2EF300ECC233 /* Encodable+JSON.swift */; };
 		8F0518C7269F444300ECC233 /* WrappedDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0518C6269F444300ECC233 /* WrappedDecodable.swift */; };
 		8F0518C8269F444300ECC233 /* WrappedDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0518C6269F444300ECC233 /* WrappedDecodable.swift */; };
+		AE3123D726B44A34009E4474 /* ArgumentExtractorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE3123D626B44A33009E4474 /* ArgumentExtractorProtocol.swift */; };
+		AE3123D826B44A34009E4474 /* ArgumentExtractorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE3123D626B44A33009E4474 /* ArgumentExtractorProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -246,6 +248,7 @@
 		8F0518BA269F2EA600ECC233 /* ReactiveHubStreamOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactiveHubStreamOutput.swift; sourceTree = "<group>"; };
 		8F0518C0269F2EF300ECC233 /* Encodable+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+JSON.swift"; sourceTree = "<group>"; };
 		8F0518C6269F444300ECC233 /* WrappedDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedDecodable.swift; sourceTree = "<group>"; };
+		AE3123D626B44A33009E4474 /* ArgumentExtractorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgumentExtractorProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -467,6 +470,7 @@
 			children = (
 				8F0518A4269F16DB00ECC233 /* HubConnectionInterface.swift */,
 				8F0518AA269F18B000ECC233 /* ReactiveHubConnection.swift */,
+				AE3123D626B44A33009E4474 /* ArgumentExtractorProtocol.swift */,
 			);
 			path = Abstractions;
 			sourceTree = "<group>";
@@ -747,6 +751,7 @@
 				7391A93D22510170007BEF23 /* StreamHandle.swift in Sources */,
 				8F0518B2269F1E6A00ECC233 /* CombineHubConnection.swift in Sources */,
 				7391A95122510170007BEF23 /* HttpConnection.swift in Sources */,
+				AE3123D826B44A34009E4474 /* ArgumentExtractorProtocol.swift in Sources */,
 				5A13255722B0CCBC0082C783 /* HubConnectionExtensions.swift in Sources */,
 				8F051891269E014900ECC233 /* CombineHTTPConnection.swift in Sources */,
 				7391A94122510170007BEF23 /* HubConnectionDelegate.swift in Sources */,
@@ -796,6 +801,7 @@
 				7391A93C22510170007BEF23 /* StreamHandle.swift in Sources */,
 				8F0518B1269F1E6A00ECC233 /* CombineHubConnection.swift in Sources */,
 				7391A95022510170007BEF23 /* HttpConnection.swift in Sources */,
+				AE3123D726B44A34009E4474 /* ArgumentExtractorProtocol.swift in Sources */,
 				5A13255622B0CCBC0082C783 /* HubConnectionExtensions.swift in Sources */,
 				8F051892269E014B00ECC233 /* CombineHTTPConnection.swift in Sources */,
 				7391A94022510170007BEF23 /* HubConnectionDelegate.swift in Sources */,

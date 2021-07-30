@@ -25,7 +25,7 @@ public final class CombineHubConnection: ReactiveHubConnection {
     // MARK: - Internal Properties
 
     let connectionSubject: PassthroughSubject<ReactiveHubConnectionEvent, ReactiveHubConnectionFailure> = .init()
-    private(set) var onMethodSubjects: [String: PassthroughSubject<ArgumentExtractor, Never>] = [:]
+    private(set) var onMethodSubjects: [String: PassthroughSubject<ArgumentExtractorProtocol, Never>] = [:]
     private(set) var streamSubjects: [String: PassthroughSubject<ReactiveHubStreamOutputBox, Error>] = [:]
     private(set) var simpleInvocationSubjects: [String: PassthroughSubject<Void, Error>] = [:]
     private(set) var decodableInvocationSubjects: [String: PassthroughSubject<WrappedDecodable?, Error>] = [:]
@@ -110,8 +110,8 @@ public final class CombineHubConnection: ReactiveHubConnection {
         .eraseToAnyPublisher()
     }
 
-    public func on(method: String) -> AnyPublisher<ArgumentExtractor, Never> {
-        let subject: PassthroughSubject<ArgumentExtractor, Never>
+    public func on(method: String) -> AnyPublisher<ArgumentExtractorProtocol, Never> {
+        let subject: PassthroughSubject<ArgumentExtractorProtocol, Never>
         if let subjectInMemory = onMethodSubjects[method] {
             subject = subjectInMemory
         } else {

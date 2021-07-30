@@ -12,7 +12,7 @@ public protocol HubConnectionProtocol: AnyObject {
     var delegate: HubConnectionDelegate? { get set }
     var connectionId: String? { get }
     func start()
-    func on(method: String, callback: @escaping (_ argumentExtractor: ArgumentExtractor) throws -> Void)
+    func on(method: String, callback: @escaping (_ argumentExtractor: ArgumentExtractorProtocol) throws -> Void)
     func send(method: String, arguments:[Encodable], sendDidComplete: @escaping (_ error: Error?) -> Void)
     func invoke(method: String, arguments: [Encodable], invocationDidComplete: @escaping (_ error: Error?) -> Void)
     func invoke<T: Decodable>(method: String, arguments: [Encodable], resultType: T.Type, invocationDidComplete: @escaping (_ result: T?, _ error: Error?) -> Void)
