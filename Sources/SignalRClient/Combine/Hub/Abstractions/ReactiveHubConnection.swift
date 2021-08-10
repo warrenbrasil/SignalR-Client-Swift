@@ -6,6 +6,7 @@
 //  Copyright © 2021 Pawel Kadluczka. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 import Foundation
 
@@ -21,3 +22,4 @@ public protocol ReactiveHubConnection: AnyObject {
     func stream<T: Decodable>(method: String, arguments: [Encodable]) -> AnyPublisher<ReactiveHubStreamOutput<T>, Error>
     func stop()
 }
+#endif

@@ -6,6 +6,7 @@
 //  Copyright © 2021 Pawel Kadluczka. All rights reserved.
 //
 
+#if canImport(Combine)
 import Foundation
 import Combine
 
@@ -100,3 +101,4 @@ extension CombineHTTPConnection: ConnectionDelegate {
         connectionSubject.send(.reconnected)
     }
 }
+#endif

@@ -5,6 +5,7 @@
 //  Created by Eduardo Bocato on 15/07/21.
 //
 
+#if canImport(Combine)
 import Combine
 @testable import SignalRClient
 import XCTest
@@ -173,3 +174,4 @@ extension Mirror {
         }.first
     }
 }
+#endif

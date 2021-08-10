@@ -6,6 +6,7 @@
 //  Copyright © 2021 Pawel Kadluczka. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 import Foundation
 
@@ -276,3 +277,4 @@ extension CombineHubConnection: HubConnectionDelegate {
         connectionSubject.send(.reconnected)
     }
 }
+#endif

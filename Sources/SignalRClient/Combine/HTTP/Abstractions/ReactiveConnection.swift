@@ -6,6 +6,7 @@
 //  Copyright © 2021 Pawel Kadluczka. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 import Foundation
 
@@ -22,3 +23,4 @@ public protocol ReactiveConnection: AnyObject {
 public extension ReactiveConnection {
     func stop() { stop(withError: nil) }
 }
+#endif

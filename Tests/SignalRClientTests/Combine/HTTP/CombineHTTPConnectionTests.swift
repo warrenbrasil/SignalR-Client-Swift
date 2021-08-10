@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 @testable import SignalRClient
 import XCTest
@@ -294,3 +295,4 @@ final class HTTPConnectionSpy: Connection {
         stopErrorPassed = stopError
     }
 }
+#endif
