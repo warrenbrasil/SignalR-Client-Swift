@@ -8,7 +8,9 @@
 
 import Cocoa
 import SignalRClient
+import Combine
 
+@available(macOS 10.15, *)
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -26,6 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var echoConnection: Connection?
     var echoConnectionDelegate: ConnectionDelegate?
 
+
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         toggleSend(isEnabled: false)
         appendLog(string: "Log")
@@ -35,12 +39,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         echoConnection?.stop(stopError: nil)
     }
 
+    var reactiveConnection: CombineHTTPConnection?
+    var subscriptions = Set<AnyCancellable>()
+
     @IBAction func btnOpen(sender: AnyObject) {
         let url = URL(string: urlTextField.stringValue)!
-        echoConnection = HttpConnection(url: url)
-        echoConnectionDelegate = EchoConnectionDelegate(app: self)
-        echoConnection!.delegate = echoConnectionDelegate
-        echoConnection!.start()
+//        echoConnection = HttpConnection(url: url)
+//        echoConnectionDelegate = EchoConnectionDelegate(app: self)
+//        echoConnection!.delegate = echoConnectionDelegate
+//        echoConnection!.start()
+
+        let options: HttpConnectionOptions = .init()
+        reactiveConnection?.publisher.sink(
+            receiveCompletion: { completion in
+                switch completion {
+                case let .failure(error):
+                    print(error)
+                case .finished:
+                    print("finished")
+                }
+            },
+            receiveValue: { event in
+                switch event {
+                case .opened(_):
+                    self.toggleSend(isEnabled: true)
+                case let .gotData(_, data):
+                    print(String(data: data, encoding: .utf8))
+                case let .succesfullySentData(data):
+                    print(String(data: data, encoding: .utf8))
+                case let .failedToSendData(data, error):
+                    print(String(data: data, encoding: .utf8))
+                    print(error)
+                case let .willReconnectAfterFailure(error):
+                    print(error)
+                case .reconnected:
+                    print("reconnected")
+                case .closed:
+                    print("closed")
+                }
+            }
+        )
+        .store(in: &subscriptions)
+
+        reactiveConnection?.start()
     }
 
     @IBAction func btnSend(sender: AnyObject) {
@@ -50,11 +91,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print(e)
             }
         }
+
+        reactiveConnection?.send(data: msgTextField.stringValue.data(using: .utf8)!)
+
         msgTextField.stringValue = ""
     }
 
     @IBAction func btnClose(sender: AnyObject) {
         echoConnection?.stop(stopError: nil)
+
+        reactiveConnection?.stop()
     }
 
     func toggleSend(isEnabled: Bool) {
@@ -71,6 +117,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+@available(macOS 10.15, *)
 class EchoConnectionDelegate: ConnectionDelegate {
 
     weak var app: AppDelegate?

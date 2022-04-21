@@ -7,8 +7,10 @@
 //
 
 import Cocoa
+import Combine
 import SignalRClient
 
+@available(iOS 13.0, macOS 10.15, *)
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate {
 
@@ -26,6 +28,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
     private var messages: [String] = []
     private var reconnectAlert: NSAlert?
 
+    private var combineHubConnection: CombineHubConnection?
+    private var subscriptions = Set<AnyCancellable>()
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         chatTableView.delegate = self
         chatTableView.dataSource = self
@@ -35,17 +40,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
 
         name = getName()
 
-        chatHubConnectionDelegate = ChatHubConnectionDelegate(app: self)
-        chatHubConnection = HubConnectionBuilder(url: URL(string:"http://localhost:5000/chat")!) // /chat or /chatLongPolling or /chatWebSockets
-            .withHubConnectionDelegate(delegate: chatHubConnectionDelegate!)
-            .withAutoReconnect()
-            .withLogging(minLogLevel: .debug)
-            .build()
+//        chatHubConnectionDelegate = ChatHubConnectionDelegate(app: self)
+//        chatHubConnection = HubConnectionBuilder(url: URL(string:"http://localhost:5000/chat")!) // /chat or /chatLongPolling or /chatWebSockets
+//            .withHubConnectionDelegate(delegate: chatHubConnectionDelegate!)
+//            .withAutoReconnect()
+//            .withLogging(minLogLevel: .debug)
+//            .build()
+//
+//        chatHubConnection!.on(method: "NewMessage", callback: { (user: String, message: String) in
+//            self.appendMessage(message: "\(user): \(message)")
+//        })
+//        chatHubConnection!.start()
 
-        chatHubConnection!.on(method: "NewMessage", callback: { (user: String, message: String) in
-            self.appendMessage(message: "\(user): \(message)")
-        })
-        chatHubConnection!.start()
+        combineHubConnection = .init(
+            url: URL(string:"http://localhost:5000/chat")!,
+            logger: PrintLogger()
+        )
+
+        combineHubConnection?
+            .connectionPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    print(completion)
+                },
+                receiveValue: { [weak self] event in
+                    switch event {
+                    case .opened:
+                        self?.connectionDidStart()
+                    case let .willReconnectAfterFailure(error):
+                        print(error)
+                    case let .streamInvocationFailed(handle, error):
+                        print(handle, error)
+                    case .reconnected:
+                        print("reconnected")
+                    case .closed:
+                        print("closed")
+                    }
+                }
+            )
+            .store(in: &subscriptions)
+
+        combineHubConnection?
+            .on(method: "NewMessage")
+            .sink(
+                receiveValue: { extractor in
+                    print(extractor)
+                }
+            )
+            .store(in: &subscriptions)
+
+        combineHubConnection?.start()
     }
 
     func getName() -> String {
@@ -66,6 +110,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
 
     func applicationWillTerminate(_ aNotification: Notification) {
         chatHubConnection?.stop()
+        combineHubConnection?.stop()
     }
 
     func connectionDidStart() {
@@ -132,11 +177,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
     @IBAction func btnSend(sender: AnyObject) {
         let message = msgTextField.stringValue
         if message != "" {
-            chatHubConnection?.invoke(method: "Broadcast", name, message) { error in
-                if let e = error {
-                    self.appendMessage(message: "Error: \(e)")
-                }
-            }
+//            chatHubConnection?.invoke(method: "Broadcast", name, message) { error in
+//                if let e = error {
+//                    self.appendMessage(message: "Error: \(e)")
+//                }
+//            }
+            combineHubConnection?
+                .invoke(method: "Broadcast", arguments: [name, message])
+                .sink(
+                    receiveCompletion: { completion in
+                        print(completion)
+                    },
+                    receiveValue: { _ in
+                        print("receiveValue")
+                    }
+                )
+                .store(in: &subscriptions)
+
             msgTextField.stringValue = ""
         }
     }
@@ -165,6 +222,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDataSource, NSTab
     }
 }
 
+@available(iOS 13.0, macOS 10.15, *)
 class ChatHubConnectionDelegate: HubConnectionDelegate {
     weak var app: AppDelegate?
 

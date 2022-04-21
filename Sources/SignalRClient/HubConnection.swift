@@ -18,7 +18,7 @@ public class HubConnection {
     private var invocationId: Int = 0
     private let hubConnectionQueue: DispatchQueue
     private var pendingCalls = [String: ServerInvocationHandler]()
-    private var callbacks = [String: (ArgumentExtractor) throws -> Void]()
+    private var callbacks = [String: (ArgumentExtractorProtocol) throws -> Void]()
     private var handshakeStatus: HandshakeStatus = .needsHandling(false)
     private let logger: Logger
 
@@ -103,7 +103,7 @@ public class HubConnection {
      - parameter argumentExtractor: an object allowing extracting arguments for the callback
      - note: Consider using typed `.on` extension methods defined on the `HubConnectionExtensions` class.
      */
-    public func on(method: String, callback: @escaping (_ argumentExtractor: ArgumentExtractor) throws -> Void) {
+    public func on(method: String, callback: @escaping (_ argumentExtractor: ArgumentExtractorProtocol) throws -> Void) {
         logger.log(logLevel: .info, message: "Registering client side hub method: '\(method)'")
 
         var callbackRegistered = false
@@ -381,7 +381,7 @@ public class HubConnection {
     }
 
     private func handleInvocation(message: ClientInvocationMessage) {
-        var callback: ((ArgumentExtractor) throws -> Void)?
+        var callback: ((ArgumentExtractorProtocol) throws -> Void)?
 
         self.hubConnectionQueue.sync {
             callback = self.callbacks[message.target]
@@ -468,7 +468,7 @@ fileprivate class HubConnectionConnectionDelegate: ConnectionDelegate {
 /**
  A helper class used for retrieving arguments of invocations of client side method.
  */
-public class ArgumentExtractor {
+public class ArgumentExtractor: ArgumentExtractorProtocol {
     let clientInvocationMessage: ClientInvocationMessage
 
     /**
